@@ -1123,6 +1123,7 @@ dtb-$(CONFIG_ARCH_VT8500) += \
 dtb-$(CONFIG_ARCH_ZYNQ) += \
 	zynq-cc108.dtb \
 	zynq-microzed.dtb \
+	zynq-microzed-uart0.dtb \
 	zynq-parallella.dtb \
 	zynq-zc702.dtb \
 	zynq-zc706.dtb \
