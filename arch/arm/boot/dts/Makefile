@@ -1294,6 +1294,7 @@ dtb-$(CONFIG_ARCH_ZYNQ) += \
 	zynq-cc108.dtb \
 	zynq-microzed.dtb \
 	zynq-microzed-uart0.dtb \
+	zynq-microzed-uart0-4sja.dtb \
 	zynq-parallella.dtb \
 	zynq-zc702.dtb \
 	zynq-zc706.dtb \
