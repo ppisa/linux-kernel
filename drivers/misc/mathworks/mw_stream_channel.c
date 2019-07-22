@@ -767,6 +767,7 @@ static void mwadma_mmap_close(struct vm_area_struct *vma)
 /*
  * @brief mwadma_mmap_fault
  */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,12,0)
 static int mwadma_mmap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 {
     struct mwadma_dev * mwdev = vma->vm_private_data;
@@ -778,6 +779,20 @@ static int mwadma_mmap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
     vmf->page = thisPage;
     return 0;
 }
+#else
+static vm_fault_t mwadma_mmap_fault(struct vm_fault *vmf)
+{
+    struct vm_area_struct *vma = vmf->vma;
+    struct mwadma_dev * mwdev = vma->vm_private_data;
+    struct page *thisPage;
+    unsigned long offset;
+    offset = (vmf->pgoff - vma->vm_pgoff) << PAGE_SHIFT;
+    thisPage = virt_to_page(MWDEV_TO_MWIP(mwdev)->mem->start + offset);
+    get_page(thisPage);
+    vmf->page = thisPage;
+    return 0;
+}
+#endif
 
 struct vm_operations_struct  mwadma_mmap_ops = {
     .open           = mwadma_mmap_open,

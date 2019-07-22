@@ -5,6 +5,7 @@
  *
  * Licensed under the GPL-2.
  */
+#include <linux/version.h>
 #include <linux/pci.h>
 #include <linux/mathworks/mathworks_ip.h>
 
@@ -73,7 +74,11 @@ static int mathworks_generic_pci_probe(struct pci_dev *pdev,
 
     thisIpcore->nirq = pci_msi_vec_count(pdev);
     if (thisIpcore->nirq > 0){
-    	thisIpcore->nirq = pci_enable_msi_range(pdev, 1, thisIpcore->nirq);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,12,0)
+		thisIpcore->nirq = pci_enable_msi_range(pdev, 1, thisIpcore->nirq);
+#else
+		pci_alloc_irq_vectors(pdev, 1, thisIpcore->nirq, PCI_IRQ_MSI);
+#endif
 		if(thisIpcore->nirq < 1) {
 			dev_err(&pdev->dev, "Failed to allocate at least 1 MSI\n");
 			return thisIpcore->nirq;

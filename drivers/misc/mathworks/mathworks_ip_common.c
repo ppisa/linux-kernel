@@ -6,6 +6,7 @@
  * Licensed under the GPL-2.
  */
 
+#include <linux/version.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/device.h>
@@ -199,7 +200,7 @@ static void mathworks_ip_mmap_close(struct vm_area_struct *vma)
 	dev_info(thisIpcore->dev, "Simple VMA close.\n");
 }
 
-
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,12,0)
 static int mathworks_ip_mmap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 {
     struct mathworks_ip_info * thisIpcore = vma->vm_private_data;
@@ -211,6 +212,20 @@ static int mathworks_ip_mmap_fault(struct vm_area_struct *vma, struct vm_fault *
     vmf->page = thisPage;
     return 0;
 }
+#else
+static vm_fault_t mathworks_ip_mmap_fault(struct vm_fault *vmf)
+{
+    struct vm_area_struct *vma = vmf->vma;
+    struct mathworks_ip_info * thisIpcore = vma->vm_private_data;
+    struct page *thisPage;
+    unsigned long offset;
+    offset = (vmf->pgoff - vma->vm_pgoff) << PAGE_SHIFT;
+    thisPage = virt_to_page(thisIpcore->mem->start + offset);
+    get_page(thisPage);
+    vmf->page = thisPage;
+    return 0;
+}
+#endif
 
 static struct vm_operations_struct mathworks_ip_mmap_ops = {
     .open   = mathworks_ip_mmap_open,
