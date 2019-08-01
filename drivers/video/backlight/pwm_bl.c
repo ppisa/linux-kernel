@@ -433,7 +433,7 @@ static int pwm_backlight_initial_power_state(const struct pwm_bl_data *pb)
 		return FB_BLANK_POWERDOWN;
 
 	/* The PWM is disabled, keep it like this */
-	if (!pwm_is_enabled(pb->pwm))
+	if (!pb->enable_gpio && !pwm_is_enabled(pb->pwm))
 		return FB_BLANK_POWERDOWN;
 
 	return FB_BLANK_UNBLANK;
